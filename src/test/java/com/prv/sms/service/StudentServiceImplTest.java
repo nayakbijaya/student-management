@@ -11,9 +11,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.prv.sms.entity.Student;
@@ -24,14 +27,19 @@ import com.prv.sms.vo.StudentVO;
 public class StudentServiceImplTest {
 	@Mock
     private StudentRepository studentRepository;
+	
+	@Mock
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private StudentServiceImpl studentService;
-
-    @Test
-    void testGetStudentsSuccess() {
-        // Mock data
-        Student student = new Student();
+    Student student;
+    List<Student> mockStudents;
+    
+    @BeforeEach
+    void setUp() throws Exception {
+    	MockitoAnnotations.openMocks(this);
+    	student = new Student();
         student.setId(1);
         student.setFirstname("John");
         student.setLastname("Doe");
@@ -44,8 +52,24 @@ public class StudentServiceImplTest {
         student.setRoleno("A12345");
         student.setSection("A");
 
-        List<Student> mockStudents = Arrays.asList(student);
+        mockStudents = Arrays.asList(student);
+    	StudentVO studentVO1 = new StudentVO();
+    	studentVO1.setId(1);
+    	studentVO1.setFirstname("John");
+    	studentVO1.setLastname("Doe");
+    	studentVO1.setEmail("john.doe@example.com");
+    	studentVO1.setAge(25);
+    	studentVO1.setDob(new Date());
+    	studentVO1.setSex('M');
+    	studentVO1.setDept("Computer Science");
+    	studentVO1.setCoursename("Database Management");
+    	studentVO1.setRoleno("A12345");
+    	studentVO1.setSection("A");
+    	when(modelMapper.map(student, StudentVO.class)).thenReturn(studentVO1);
+    }
 
+    @Test
+    void testGetStudentsSuccess() {
         // Mock behavior of studentRepository
         when(studentRepository.findAll()).thenReturn(mockStudents);
 
